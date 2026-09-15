@@ -15,6 +15,51 @@ text-to-speech systems, automatic speech recognition systems, personas,
 scenarios, and speech conditions. It records raw phase evidence during the
 dialogue and calculates all registered metrics retrospectively.
 
+## Project at a glance
+
+**Author: Michail Sendetskiy · Python · speech dialogue evaluation**
+
+A dialogue can sound plausible while proposing an invalid route or forgetting a
+traveller's constraint. This thesis research framework makes those failures
+inspectable: two agents negotiate a transport route, and the system records how
+language generation, speech recognition, dialogue decisions, and route validity
+contribute to the outcome.
+
+| Explore | Start here |
+| --- | --- |
+| The task | [Transport network](#7-transport-network-and-dialogue-task) and [network diagram](docs/network_graph.svg) |
+| Engineering | [Pipeline](#5-pipeline), [experiment integrity](#6-experiment-integrity), and [source package](coop_navigation_sds/) |
+| Reproducible design | [Agent B experiment guide](jobs/agent_b_llm/README.md) and [batch manifests](jobs/agent_b_llm/batches/) |
+| Implementation checks | [Test sources](tests/) and [validation instructions](#19-validation) |
+| Outputs | [Result structure](#16-result-structure) and [comparison/reporting guide](#13-batch-comparison-and-visualization) |
+
+After following the [setup instructions](#10-setup), a dependency-light check is:
+
+```bash
+python -m coop_navigation_sds --smoke
+```
+
+This exercises the pipeline with lightweight deterministic agents. It does not
+establish comparative performance of the full language and speech models.
+
+### Reading experiment counts
+
+Experiment sizes belong to a specific manifest and revision. The
+[documented design at revision 6bc7f943](https://github.com/generalgroovy/sds/blob/6bc7f943dbe8bece0b68c4f6d8782f00942f4b5c/jobs/agent_b_llm/README.md)
+uses six Agent B models:
+
+| Design | Configured conditions |
+| --- | ---: |
+| One focused model/caller job | 26: 13 audio and 13 matched text controls |
+| UserLM-only comparison, six jobs | 156 total |
+| Both caller variants, twelve jobs | 312 total |
+| Expanded speech-grid comparison, six jobs | 312 total: 52 per job |
+
+These are configured condition counts. Completed runs and measured findings
+must be read from the corresponding run manifests and result artifacts. When
+citing a different experiment or an earlier design, link its exact manifest
+and revision.
+
 ## Reader Guide
 
 | Chapter | Purpose |
