@@ -1,5 +1,11 @@
 # CoopNavigationSDS
 
+**Start with a pipeline check:** `python -m coop_navigation_sds --smoke`.
+It uses deterministic agents without model downloads or audio playback and prints
+the outcome and results folder. Use `--smoke --results-dir PATH` to choose another
+output folder. Run without options to configure a full experiment. `--help` works
+without loading the experiment runtime.
+
 CoopNavigationSDS is a research framework for the automatic, phase-aware
 evaluation of cooperative speech dialogue systems. Two agents solve a public
 transport route-finding task:
