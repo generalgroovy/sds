@@ -36,8 +36,8 @@ from coop_navigation_sds.TransportNetwork.test_cases import get_test_case
 from coop_navigation_sds.smoke import smoke_run_config
 
 
-def test_readme_documents_complete_experiment_network_contract():
-    readme = (Path(__file__).resolve().parents[1] / "README.md").read_text(encoding="utf-8")
+def test_research_guide_documents_complete_experiment_network_contract():
+    readme = (Path(__file__).resolve().parents[1] / "RESEARCH_GUIDE.md").read_text(encoding="utf-8")
 
     for heading in (
         "### Network Parameters",
@@ -61,8 +61,8 @@ def test_readme_documents_complete_experiment_network_contract():
         assert required_value in readme
 
 
-def test_readme_names_every_runtime_configuration_setting():
-    readme = (Path(__file__).resolve().parents[1] / "README.md").read_text(encoding="utf-8")
+def test_research_guide_names_every_runtime_configuration_setting():
+    readme = (Path(__file__).resolve().parents[1] / "RESEARCH_GUIDE.md").read_text(encoding="utf-8")
 
     undocumented = [
         key for key in sorted(default_run_config())

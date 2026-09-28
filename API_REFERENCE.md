@@ -13,7 +13,9 @@ No public runtime components are defined in this module.
 
 Run an interactive experiment or a deterministic smoke experiment.
 
-No public runtime components are defined in this module.
+### Function `main(argv=None)`
+
+Internal module operation.
 
 ## `coop_navigation_sds/app.py`
 
@@ -130,6 +132,10 @@ Batch experiment entry point for automatic evaluation of speech-dialog condition
 ### Function `parse_csv_arg(value, all_values=None)`
 
 Parse a comma-separated CLI argument into a list.
+
+### Function `select_condition_shard(conditions, start=0, count=None)`
+
+Return one validated contiguous condition shard without changing order.
 
 ### Function `parse_bool_flag(value)`
 
@@ -464,6 +470,10 @@ Return one portable, bounded filename component.
 
 Return one stable results root independent of the process working directory.
 
+### Function `resolve_result_group(results_root, group=None)`
+
+Resolve a portable relative result group beneath one results root.
+
 ### Class `RunArtifactPaths`
 
 Canonical flat artifact paths for one completed experiment run.
@@ -493,6 +503,61 @@ Merge saved JSON settings over supplied defaults.
 ### Function `save_run_settings(config, path=None)`
 
 Atomically save persistent run settings and return their path.
+
+## `coop_navigation_sds/Configuration/slurm_grid.py`
+
+Deterministic, scheduler-neutral condition grids for Slurm array jobs.
+
+### Function `_tinyllama_backend()`
+
+Internal module operation.
+
+### Function `_immutable_mapping(values=None)`
+
+Internal module operation.
+
+### Function `_canonical_hash(values, length=12)`
+
+Internal module operation.
+
+### Function `_registry_selection(value, registry, label)`
+
+Internal module operation.
+
+### Class `AgentBBackend`
+
+One plugin/model treatment independent of scheduler resources.
+
+- `AgentBBackend.from_value(cls, value)`: Internal class operation.
+- `AgentBBackend.as_dict(self)`: Internal class operation.
+
+### Class `SlurmCondition`
+
+One immutable scheduler-array treatment.
+
+- `SlurmCondition.experimental_factors(self)`: Internal class operation.
+- `SlurmCondition.condition_id(self)`: Internal class operation.
+- `SlurmCondition.as_dict(self, runtime_overrides=None)`: Internal class operation.
+
+### Class `SlurmConditionGrid`
+
+Validated condition collection with stable index ordering.
+
+- `SlurmConditionGrid.from_document(cls, document, source='')`: Internal class operation.
+- `SlurmConditionGrid.from_file(cls, path)`: Internal class operation.
+- `SlurmConditionGrid.condition(self, index)`: Internal class operation.
+
+### Function `condition_directory_name(condition, runtime_overrides=None)`
+
+Return a bounded directory name unique to factors and runtime overrides.
+
+### Function `reserve_condition_directory(results_root, condition, runtime_overrides=None)`
+
+Atomically reserve a new task folder without overwriting a prior attempt.
+
+### Function `export_condition_json(condition, path, runtime_overrides=None)`
+
+Write the exact resolved condition once; refuse accidental replacement.
 
 ## `coop_navigation_sds/Configuration/speech.py`
 
@@ -580,6 +645,10 @@ Tracks spoken route candidates so a dialog does not accept repeats.
 
 Persistent subprocess bridge for dependency-isolated speech providers.
 
+### Class `ProviderProcessStoppedError`
+
+Raised when an isolated provider exits before returning a response.
+
 ### Function `_provider_key(engine)`
 
 Internal module operation.
@@ -598,8 +667,9 @@ Maintain one JSON-lines worker so model weights remain loaded.
 
 - `ProviderProcessClient.__init__(self, python, stage, engine, timeout_seconds, log_path=None)`: Internal class operation.
 - `ProviderProcessClient._start(self)`: Internal class operation.
-- `ProviderProcessClient._read_responses(self)`: Internal class operation.
+- `ProviderProcessClient._read_responses(process, response_queue)`: Internal class operation.
 - `ProviderProcessClient.request(self, payload)`: Internal class operation.
+- `ProviderProcessClient._request_once(self, payload)`: Internal class operation.
 - `ProviderProcessClient.close(self)`: Internal class operation.
 - `ProviderProcessClient.__del__(self)`: Internal class operation.
 
@@ -1719,6 +1789,10 @@ Internal module operation.
 
 Internal module operation.
 
+### Function `_trust_remote_code(model_name)`
+
+Return whether a registered model explicitly requires Hub model code.
+
 ### Function `load_model_and_tokenizer(model_name: str=MODEL, token: str | None=TOKEN, device: str=DEVICE, allow_model_download: bool=ALLOW_MODEL_DOWNLOAD)`
 
 Load model and tokenizer function for this module's MVC responsibility.
@@ -2159,10 +2233,9 @@ Aggregate each numeric metric by run and experimental component tuple.
 
 Calculate pairwise mean differences for matching metrics and run types.
 
-### Function `identify_metric_outliers(metrics, conditions, minimum_samples=5, modified_z_threshold=3.5)`
+### Function `identify_metric_outliers(metrics, conditions, minimum_samples=OUTLIER_MINIMUM_SAMPLES, modified_z_threshold=OUTLIER_MODIFIED_Z_THRESHOLD)`
 
-Find robust pre-outcome metric outliers and relate them descriptively to task
-outcomes without using outcome-phase metrics as predictors.
+Find robust pre-outcome metric outliers and relate them to task outcomes.
 
 ### Function `summarize_run_outcomes(conditions, outliers=())`
 
@@ -2170,8 +2243,7 @@ Summarize condition-level task outcomes and aligned metric signals per run.
 
 ### Function `summarize_metric_indicators(outliers)`
 
-Aggregate which pre-outcome metric outliers align with observed success or
-failure, retaining contradictory evidence.
+Aggregate which metric outliers align with observed success or failure.
 
 ### Function `_selected_chart_rows(summaries, limit=12)`
 
@@ -2183,8 +2255,7 @@ Internal module operation.
 
 ### Function `write_html_report(path, run_directories, conditions, summaries, deltas, run_outcomes, outliers, metric_indicators)`
 
-Write a dependency-free color-coded HTML report with run outcomes, metric
-outlier alignment, and inline SVG comparisons.
+Write a dependency-free HTML report with inline SVG comparisons.
 
 ### Function `compare_runs(inputs, output_directory)`
 
@@ -2193,6 +2264,50 @@ Build a complete comparison dataset and return its artifact paths.
 ### Function `main(argv=None)`
 
 Internal module operation.
+
+## `coop_navigation_sds/ResultsAndArtifacts/coverage.py`
+
+Build a results-root registry of planned and completed experiment coverage.
+
+### Function `_levels(job, key, fallback)`
+
+Internal module operation.
+
+### Function `_coverage_key(row)`
+
+Internal module operation.
+
+### Function `_planned_rows(job_path)`
+
+Internal module operation.
+
+### Function `_read_jsonl(path)`
+
+Internal module operation.
+
+### Function `_completed_rows(results_root)`
+
+Internal module operation.
+
+### Function `_merge_coverage(planned_rows, completed_rows)`
+
+Internal module operation.
+
+### Function `_matrix_rows(coverage_rows)`
+
+Internal module operation.
+
+### Function `_atomic_csv(path, rows)`
+
+Internal module operation.
+
+### Function `_html_report(summary, matrix_rows)`
+
+Internal module operation.
+
+### Function `update_experiment_coverage(results_root, job_roots=None)`
+
+Rebuild unified coverage artifacts from jobs and finalized result folders.
 
 ## `coop_navigation_sds/ResultsAndArtifacts/logging.py`
 
@@ -2409,7 +2524,7 @@ Return a dependency-light configuration that traverses every runtime phase.
 
 ### Function `run_smoke(results_dir='results', event_queue=None)`
 
-Run the deterministic pipeline and return its result and artifact paths.
+Require a satisfied deterministic task and return its result and artifact paths.
 
 ### Function `main(argv=None)`
 

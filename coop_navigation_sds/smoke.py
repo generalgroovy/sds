@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import argparse
 from pathlib import Path
+import sys
 
 from coop_navigation_sds.DialogManagement.result import NullEventQueue
 from coop_navigation_sds.app import (
@@ -36,11 +37,18 @@ def smoke_run_config(results_dir="results"):
 
 
 def run_smoke(results_dir="results", event_queue=None):
-    """Run the deterministic pipeline and return its result and artifact paths."""
+    """Require a satisfied deterministic task and return its result and artifact paths."""
     config = validate_run_config_for_start(smoke_run_config(results_dir))
     completed = conversation_worker(event_queue or NullEventQueue(), None, config)
     if completed is None:
         raise RuntimeError("Smoke experiment failed; inspect the emitted warning and run folder.")
+    result, paths = completed
+    outcome = result.extra.get("conversation_outcome", "unknown")
+    if outcome != "satisfied":
+        raise RuntimeError(
+            f"Smoke task outcome was {outcome!r}, expected 'satisfied'; "
+            f"inspect {paths['run_dir']}."
+        )
     return completed
 
 
@@ -48,7 +56,11 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description="Run the deterministic SDS smoke experiment.")
     parser.add_argument("--results-dir", default="results")
     args = parser.parse_args(argv)
-    result, paths = run_smoke(args.results_dir)
+    try:
+        result, paths = run_smoke(args.results_dir)
+    except (OSError, ValueError, RuntimeError) as error:
+        print(f"Smoke check failed: {error}", file=sys.stderr)
+        return 1
     print(f"Smoke outcome: {result.extra.get('conversation_outcome', 'unknown')}")
     print(f"Run folder: {paths['run_dir']}")
     print(f"Manifest: {paths['run_manifest']}")
